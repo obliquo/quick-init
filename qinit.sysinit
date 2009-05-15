@@ -24,31 +24,39 @@ printsep
 
 # Default nodes
 /bin/mknod /dev/full c 1 7
-/bin/mknod /dev/kmem c 1 2
-/bin/mknod /dev/mem c 1 1
-/bin/mknod /dev/ptmx c 5 2
-/bin/mknod /dev/tty c 5 0
+/bin/mknod -m 640 /dev/kmem c 1 2
+/bin/mknod -m 755 /dev/ptmx c 5 2
+/bin/mknod -m 755 /dev/tty c 5 0
 /bin/mkdir -m 755 /dev/vc
-/bin/mkdir -m 755 /dev/dri
-/bin/mknod -m 660 /dev/dri/card0 c 226 0
 /bin/mknod /dev/vc/0 c 4 0
 /bin/mknod /dev/vc/1 c 4 1
 /bin/mknod /dev/vc/2 c 4 2
-/bin/mknod /dev/sda1 b 8 1
-/bin/mknod /dev/sda2 b 8 2
-/bin/mknod /dev/sda3 b 8 3
-/bin/mknod /dev/sda4 b 8 4
+/bin/ln -fs /dev/tty0 /dev/vc/0
+/bin/ln -fs /dev/tty1 /dev/vc/1
+/bin/ln -fs /dev/tty2 /dev/vc/2
+/bin/mknod -m 640 /dev/mem c 1 1
+	#ATI
+	/bin/mkdir -m 755 /dev/dri
+	/bin/mknod -m 666 /dev/dri/card0 c 226 0
+	#INTEL
+	/bin/mknod -m 600 /dev/misc/agpgart c 10 175
+	/bin/ln -fs /dev/agpgart /dev/misc/agpgart
+	#NVIDIA
+	/bin/mknod -m 666 /dev/nvidia0 c 195 0
+	/bin/mknod -m 666 /dev/nvidiactl c 195 255
+
 
 # start up our mini logger until syslog takes over
 /sbin/minilogd
 
+
 # anything more serious than KERN_WARNING goes to the console
-# 'verbose' cmdline parameter enables more messages
 if /bin/grep -q " verbose" /proc/cmdline; then
 	/bin/dmesg -n 8
 else
 	/bin/dmesg -n 3
 fi
+
 
 # enable rtc access
 /sbin/modprobe rtc-cmos >/dev/null 2>&1

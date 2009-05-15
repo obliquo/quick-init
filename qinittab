@@ -11,26 +11,22 @@
 #    5    X11
 #    6    Reboot
 
-## Only one of the following two lines can be uncommented!
-# Boot to console
 id:3:initdefault:
-# Boot to X11
-#id:5:initdefault:
 
 rc::sysinit:/etc/qinit.sysinit
 rs:S1:wait:/etc/rc.single
-#pw:2345:respawn:/bin/su adriano -l -c "/bin/bash --login -c xinit >/dev/null 2>&1"
+
+#put in xorg: level gdm,kdm,slim,xdm otherwise put one of them in /etc/rc.local
+#xorg:2345:respawn:/usr/bin/xdm -nodaemon
+#xorg:2345:respawn:/usr/sbin/gdm -nodaemon
+#xorg:2345:respawn:/usr/bin/kdm -nodaemon
+#xorg:2345:respawn:/usr/bin/slim >& /dev/null
+#xorg:2345:respawn:/bin/su YOURUSERNAME -l -c "/bin/bash --login -c xinit >/dev/null 2>&1"
+
 c1:2345:respawn:/sbin/agetty -8 38400 vc/1 linux
+
 rm:2345:wait:/etc/qinit.multi > /dev/null
 rh:06:wait:/etc/rc.shutdown
 su:S:wait:/sbin/sulogin -p
 
 ca::ctrlaltdel:/sbin/shutdown -t3 -r now
-
-# Example lines for starting a login manager
-#x:5:respawn:/usr/bin/xdm -nodaemon
-#x:5:respawn:/usr/sbin/gdm -nodaemon
-#x:5:respawn:/usr/bin/kdm -nodaemon
-#x:5:respawn:/usr/bin/slim >& /dev/null
-
-# End of file
